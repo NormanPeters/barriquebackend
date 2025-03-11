@@ -1,6 +1,6 @@
 package com.barriquebackend.bucksbuddy.journey;
 
-import com.barriquebackend.bucksbuddy.journey.expenditure.Expenditure;
+import com.barriquebackend.bucksbuddy.journey.expense.Expense;
 import com.barriquebackend.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -44,7 +44,7 @@ public class Journey {
 
     @OneToMany(mappedBy = "journey", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private Set<Expenditure> expenditures;
+    private Set<Expense> expenses;
 
     // Getters and setters
     public Long getJourneyId() {
@@ -115,11 +115,11 @@ public class Journey {
         this.endDate = endDate;
     }
 
-    public Set<Expenditure> getExpenditures() {
-        return expenditures;
+    public Set<Expense> getExpense() {
+        return expenses;
     }
 
-    public void setExpenditures(Set<Expenditure> expenditures) {
-        this.expenditures = expenditures;
+    public void setExpense(Set<Expense> expenses) {
+        this.expenses = expenses;
     }
 }

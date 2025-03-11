@@ -1,4 +1,4 @@
-package com.barriquebackend.bucksbuddy.journey.expenditure;
+package com.barriquebackend.bucksbuddy.journey.expense;
 
 import com.barriquebackend.bucksbuddy.journey.Journey;
 import com.barriquebackend.bucksbuddy.journey.JourneyService;
@@ -13,115 +13,115 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for managing expenditures related to journeys.
- * Provides endpoints to create, retrieve, update, and delete expenditures.
+ * REST controller for managing expenses related to journeys.
+ * Provides endpoints to create, retrieve, update, and delete expenses.
  */
 @RestController
 @RequestMapping("/api")
-public class ExpenditureController {
+public class ExpenseController {
 
-    private final ExpenditureService expenditureService;
+    private final ExpenseService expenseService;
     private final JourneyService journeyService;
     private final UserRepository userRepository;
 
     /**
-     * Constructs an ExpenditureController with the specified services and user repository.
+     * Constructs an ExpenseController with the specified services and user repository.
      *
-     * @param expenditureService the service for expenditure business logic
+     * @param expenseService the service for expense business logic
      * @param journeyService     the service for journey business logic
      * @param userRepository     the repository for user data
      */
     @Autowired
-    public ExpenditureController(ExpenditureService expenditureService, JourneyService journeyService, UserRepository userRepository) {
-        this.expenditureService = expenditureService;
+    public ExpenseController(ExpenseService expenseService, JourneyService journeyService, UserRepository userRepository) {
+        this.expenseService = expenseService;
         this.journeyService = journeyService;
         this.userRepository = userRepository;
     }
 
     /**
-     * Retrieves all expenditures for a given journey.
+     * Retrieves all expense for a given journey.
      *
      * @param journeyId      the ID of the journey
      * @param authentication the authentication token containing user details
-     * @return a ResponseEntity with the list of expenditures if authorized, or an error status
+     * @return a ResponseEntity with the list of expense if authorized, or an error status
      */
-    @GetMapping("/journey/{journeyId}/expenditure")
-    public ResponseEntity<List<Expenditure>> getAllExpendituresByJourneyId(@PathVariable Long journeyId,
-                                                                           Authentication authentication) {
+    @GetMapping("/journey/{journeyId}/expense")
+    public ResponseEntity<List<Expense>> getAllExpenseByJourneyId(@PathVariable Long journeyId,
+                                                                  Authentication authentication) {
         Optional<Journey> authorizedJourney = getAuthorizedJourney(journeyId, authentication);
         if (authorizedJourney.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         User user = getAuthenticatedUser(authentication);
-        List<Expenditure> expenditures = expenditureService.getAllExpendituresByJourneyId(journeyId, user.getId());
-        return ResponseEntity.ok(expenditures);
+        List<Expense> expenses = expenseService.getAllExpenseByJourneyId(journeyId, user.getId());
+        return ResponseEntity.ok(expenses);
     }
 
     /**
-     * Retrieves an expenditure by its ID for a given journey.
+     * Retrieves an expense by its ID for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expenditureId  the ID of the expenditure
+     * @param expenseId  the ID of the expense
      * @param authentication the authentication token containing user details
-     * @return a ResponseEntity with the expenditure if found and authorized, or an error status
+     * @return a ResponseEntity with the expense if found and authorized, or an error status
      */
-    @GetMapping("/journey/{journeyId}/expenditure/{expenditureId}")
-    public ResponseEntity<Expenditure> getExpenditureById(@PathVariable Long journeyId,
-                                                          @PathVariable Long expenditureId,
-                                                          Authentication authentication) {
+    @GetMapping("/journey/{journeyId}/expense/{expenseId}")
+    public ResponseEntity<Expense> getExpenseById(@PathVariable Long journeyId,
+                                                  @PathVariable Long expenseId,
+                                                  Authentication authentication) {
         Optional<Journey> authorizedJourney = getAuthorizedJourney(journeyId, authentication);
         if (authorizedJourney.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Optional<Expenditure> expenditureOpt = expenditureService.getExpenditureById(expenditureId);
-        if (expenditureOpt.isPresent() && expenditureOpt.get().getJourney().getJourneyId().equals(journeyId)) {
-            return ResponseEntity.ok(expenditureOpt.get());
+        Optional<Expense> expenseServiceOpt = expenseService.getExpenseById(expenseId);
+        if (expenseServiceOpt.isPresent() && expenseServiceOpt.get().getJourney().getJourneyId().equals(journeyId)) {
+            return ResponseEntity.ok(expenseServiceOpt.get());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     /**
-     * Creates a new expenditure for a given journey.
+     * Creates a new expenseService for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expenditure    the expenditure data to create
+     * @param expense    the expenseService data to create
      * @param authentication the authentication token containing user details
-     * @return a ResponseEntity with the created expenditure if successful, or an error status
+     * @return a ResponseEntity with the created expenseService if successful, or an error status
      */
-    @PostMapping("/journey/{journeyId}/expenditure")
-    public ResponseEntity<Expenditure> createExpenditure(@PathVariable Long journeyId,
-                                                         @RequestBody Expenditure expenditure,
-                                                         Authentication authentication) {
+    @PostMapping("/journey/{journeyId}/expense")
+    public ResponseEntity<Expense> createExpense(@PathVariable Long journeyId,
+                                                 @RequestBody Expense expense,
+                                                 Authentication authentication) {
         Optional<Journey> authorizedJourney = getAuthorizedJourney(journeyId, authentication);
         if (authorizedJourney.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Expenditure createdExpenditure = expenditureService.createExpenditure(journeyId, expenditure);
-        return new ResponseEntity<>(createdExpenditure, HttpStatus.CREATED);
+        Expense createdExpense = expenseService.createExpense(journeyId, expense);
+        return new ResponseEntity<>(createdExpense, HttpStatus.CREATED);
     }
 
     /**
-     * Updates an existing expenditure for a given journey.
+     * Updates an existing expenseService for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expenditureId  the ID of the expenditure to update
-     * @param expenditure    the updated expenditure data
+     * @param expenseId  the ID of the expenseService to update
+     * @param expense    the updated expenseService data
      * @param authentication the authentication token containing user details
-     * @return a ResponseEntity with the updated expenditure if successful, or an error status
+     * @return a ResponseEntity with the updated expenseService if successful, or an error status
      */
-    @PutMapping("/journey/{journeyId}/expenditure/{expenditureId}")
-    public ResponseEntity<Expenditure> updateExpenditure(@PathVariable Long journeyId,
-                                                         @PathVariable Long expenditureId,
-                                                         @RequestBody Expenditure expenditure,
-                                                         Authentication authentication) {
+    @PutMapping("/journey/{journeyId}/expense/{expenseId}")
+    public ResponseEntity<Expense> updateExpense(@PathVariable Long journeyId,
+                                                 @PathVariable Long expenseId,
+                                                 @RequestBody Expense expense,
+                                                 Authentication authentication) {
         Optional<Journey> authorizedJourney = getAuthorizedJourney(journeyId, authentication);
         if (authorizedJourney.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Optional<Expenditure> existingExp = expenditureService.getExpenditureById(expenditureId);
+        Optional<Expense> existingExp = expenseService.getExpenseById(expenseId);
         if (existingExp.isPresent() && existingExp.get().getJourney().getJourneyId().equals(journeyId)) {
-            Optional<Expenditure> updatedExp = expenditureService.updateExpenditure(expenditureId, expenditure);
+            Optional<Expense> updatedExp = expenseService.updateExpense(expenseId, expense);
             return updatedExp.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         } else {
             return ResponseEntity.notFound().build();
@@ -129,24 +129,24 @@ public class ExpenditureController {
     }
 
     /**
-     * Deletes an expenditure for a given journey.
+     * Deletes an expenseService for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expenditureId  the ID of the expenditure to delete
+     * @param expenseId  the ID of the expenseService to delete
      * @param authentication the authentication token containing user details
      * @return a ResponseEntity with no content if deletion is successful, or an error status
      */
-    @DeleteMapping("/journey/{journeyId}/expenditure/{expenditureId}")
-    public ResponseEntity<Void> deleteExpenditure(@PathVariable Long journeyId,
-                                                  @PathVariable Long expenditureId,
-                                                  Authentication authentication) {
+    @DeleteMapping("/journey/{journeyId}/expense/{expenseId}")
+    public ResponseEntity<Void> deleteExpense(@PathVariable Long journeyId,
+                                              @PathVariable Long expenseId,
+                                              Authentication authentication) {
         Optional<Journey> authorizedJourney = getAuthorizedJourney(journeyId, authentication);
         if (authorizedJourney.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Optional<Expenditure> expenditureOpt = expenditureService.getExpenditureById(expenditureId);
-        if (expenditureOpt.isPresent() && expenditureOpt.get().getJourney().getJourneyId().equals(journeyId)) {
-            boolean deleted = expenditureService.deleteExpenditure(expenditureId);
+        Optional<Expense> expenseServiceOpt = expenseService.getExpenseById(expenseId);
+        if (expenseServiceOpt.isPresent() && expenseServiceOpt.get().getJourney().getJourneyId().equals(journeyId)) {
+            boolean deleted = expenseService.deleteExpense(expenseId);
             return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.notFound().build();

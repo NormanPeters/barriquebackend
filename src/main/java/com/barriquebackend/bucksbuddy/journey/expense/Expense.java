@@ -1,4 +1,4 @@
-package com.barriquebackend.bucksbuddy.journey.expenditure;
+package com.barriquebackend.bucksbuddy.journey.expense;
 
 import com.barriquebackend.bucksbuddy.journey.Journey;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -6,12 +6,12 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "expenditures")
-public class Expenditure {
+@Table(name = "expense")
+public class Expense {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long expenditureId;
+    private Long expenseId;
 
     @ManyToOne
     @JoinColumn(name = "journey_id", nullable = false)
@@ -24,12 +24,12 @@ public class Expenditure {
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    public Long getExpenditureId() {
-        return expenditureId;
+    public Long getExpenseId() {
+        return expenseId;
     }
 
-    public void setExpenditureId(Long expenditureId) {
-        this.expenditureId = expenditureId;
+    public void setExpenseId(Long expenseId) {
+        this.expenseId = expenseId;
     }
 
     public String getName() {
