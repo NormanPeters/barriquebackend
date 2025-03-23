@@ -7,7 +7,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "journeys")
@@ -36,15 +37,17 @@ public class Journey {
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date startDate;
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date endDate;
 
     @OneToMany(mappedBy = "journey", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private Set<Expense> expenses;
+    private List<Expense> expenses = new ArrayList<>();
 
     // Getters and setters
     public Long getJourneyId() {
@@ -95,8 +98,6 @@ public class Journey {
         this.budget = budget;
     }
 
-    // Updated getter to return Date instead of String
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public Date getStartDate() {
         return startDate;
     }
@@ -105,8 +106,6 @@ public class Journey {
         this.startDate = startDate;
     }
 
-    // Updated getter to return Date instead of String
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public Date getEndDate() {
         return endDate;
     }
@@ -115,11 +114,23 @@ public class Journey {
         this.endDate = endDate;
     }
 
-    public Set<Expense> getExpense() {
+    public List<Expense> getExpenses() {
         return expenses;
     }
 
-    public void setExpense(Set<Expense> expenses) {
+    public void setExpenses(List<Expense> expenses) {
         this.expenses = expenses;
+    }
+
+    // Helper method to add an expense to the list
+    public void addExpense(Expense expense) {
+        expenses.add(expense);
+        expense.setJourney(this);
+    }
+
+    // Helper method to remove an expense from the list
+    public void removeExpense(Expense expense) {
+        expenses.remove(expense);
+        expense.setJourney(null);
     }
 }

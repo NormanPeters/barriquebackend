@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service class for handling business logic related to expenseRepositorys.
- * Provides methods for creating, retrieving, updating, and deleting expenseRepositorys
+ * Service class for handling business logic related to expenses.
+ * Provides methods for creating, retrieving, updating, and deleting expenses
  * that are associated with a specific journey and user.
  */
 @Service
@@ -19,10 +19,10 @@ public class ExpenseService {
     private final JourneyRepository journeyRepository;
 
     /**
-     * Constructs an expenseRepositoryService with the given repositories.
+     * Constructs an ExpenseService with the given repositories.
      *
-     * @param expenseRepository the repository for performing CRUD operations on expenseRepositorys
-     * @param journeyRepository     the repository for retrieving journeys
+     * @param expenseRepository the repository for performing CRUD operations on expenses
+     * @param journeyRepository the repository for retrieving journeys
      */
     @Autowired
     public ExpenseService(ExpenseRepository expenseRepository, JourneyRepository journeyRepository) {
@@ -31,32 +31,32 @@ public class ExpenseService {
     }
 
     /**
-     * Retrieves all expenseRepositorys for a specific journey that belong to a given user.
+     * Retrieves all expenses for a specific journey that belong to a given user.
      *
      * @param journeyId the ID of the journey
      * @param userId    the ID of the user
-     * @return a list of expenseRepositorys associated with the journey and user
+     * @return a list of expenses associated with the journey and user
      */
     public List<Expense> getAllExpenseByJourneyId(Long journeyId, Long userId) {
         return expenseRepository.findAllByJourney_JourneyIdAndJourney_User_Id(journeyId, userId);
     }
 
     /**
-     * Retrieves an expenseRepository by its ID.
+     * Retrieves an expense by its ID.
      *
-     * @param expenseRepositoryId the ID of the expenseRepository
-     * @return an Optional containing the expenseRepository if found, or empty otherwise
+     * @param expenseId the ID of the expense
+     * @return an Optional containing the expense if found, or empty otherwise
      */
-    public Optional<Expense> getExpenseById(Long expenseRepositoryId) {
-        return expenseRepository.findByExpenseId(expenseRepositoryId);
+    public Optional<Expense> getExpenseById(Long expenseId) {
+        return expenseRepository.findByExpenseId(expenseId);
     }
 
     /**
-     * Creates a new expenseRepository for a given journey.
+     * Creates a new expense for a given journey.
      *
-     * @param journeyId   the ID of the journey
-     * @param expense the expenseRepository to be created
-     * @return the created expenseRepository
+     * @param journeyId the ID of the journey
+     * @param expense the expense to be created
+     * @return the created expense
      * @throws IllegalArgumentException if the journey is not found
      */
     public Expense createExpense(Long journeyId, Expense expense) {
@@ -64,6 +64,10 @@ public class ExpenseService {
         if (journeyOpt.isPresent()) {
             Journey journey = journeyOpt.get();
             expense.setJourney(journey);
+
+            // Add the expense to the journey's expense list
+            journey.addExpense(expense);
+
             return expenseRepository.save(expense);
         } else {
             throw new IllegalArgumentException("Journey not found for id: " + journeyId);
@@ -71,14 +75,14 @@ public class ExpenseService {
     }
 
     /**
-     * Updates an existing expenseRepository.
+     * Updates an existing expense.
      *
-     * @param expenseRepositoryId     the ID of the expenseRepository to update
-     * @param updatedExpense the updated expenseRepository data
-     * @return an Optional containing the updated expenseRepository if the update was successful, or empty otherwise
+     * @param expenseId the ID of the expense to update
+     * @param updatedExpense the updated expense data
+     * @return an Optional containing the updated expense if the update was successful, or empty otherwise
      */
-    public Optional<Expense> updateExpense(Long expenseRepositoryId, Expense updatedExpense) {
-        return expenseRepository.findByExpenseId(expenseRepositoryId).map(expense -> {
+    public Optional<Expense> updateExpense(Long expenseId, Expense updatedExpense) {
+        return expenseRepository.findByExpenseId(expenseId).map(expense -> {
             expense.setName(updatedExpense.getName());
             expense.setAmount(updatedExpense.getAmount());
             expense.setDate(updatedExpense.getDate());
@@ -87,14 +91,24 @@ public class ExpenseService {
     }
 
     /**
-     * Deletes an expenseRepository by its ID.
+     * Deletes an expense by its ID.
      *
-     * @param expenseRepositoryId the ID of the expenseRepository to delete
-     * @return true if the expenseRepository was deleted successfully, false otherwise
+     * @param expenseId the ID of the expense to delete
+     * @return true if the expense was deleted successfully, false otherwise
      */
-    public boolean deleteExpense(Long expenseRepositoryId) {
-        if (expenseRepository.existsById(expenseRepositoryId)) {
-            expenseRepository.deleteById(expenseRepositoryId);
+    public boolean deleteExpense(Long expenseId) {
+        Optional<Expense> expenseOpt = expenseRepository.findByExpenseId(expenseId);
+
+        if (expenseOpt.isPresent()) {
+            Expense expense = expenseOpt.get();
+            Journey journey = expense.getJourney();
+
+            // Remove the expense from the journey's expense list
+            if (journey != null) {
+                journey.removeExpense(expense);
+            }
+
+            expenseRepository.deleteById(expenseId);
             return true;
         }
         return false;

@@ -28,8 +28,8 @@ public class ExpenseController {
      * Constructs an ExpenseController with the specified services and user repository.
      *
      * @param expenseService the service for expense business logic
-     * @param journeyService     the service for journey business logic
-     * @param userRepository     the repository for user data
+     * @param journeyService the service for journey business logic
+     * @param userRepository the repository for user data
      */
     @Autowired
     public ExpenseController(ExpenseService expenseService, JourneyService journeyService, UserRepository userRepository) {
@@ -39,11 +39,11 @@ public class ExpenseController {
     }
 
     /**
-     * Retrieves all expense for a given journey.
+     * Retrieves all expenses for a given journey.
      *
      * @param journeyId      the ID of the journey
      * @param authentication the authentication token containing user details
-     * @return a ResponseEntity with the list of expense if authorized, or an error status
+     * @return a ResponseEntity with the list of expenses if authorized, or an error status
      */
     @GetMapping("/journey/{journeyId}/expense")
     public ResponseEntity<List<Expense>> getAllExpenseByJourneyId(@PathVariable Long journeyId,
@@ -61,7 +61,7 @@ public class ExpenseController {
      * Retrieves an expense by its ID for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expenseId  the ID of the expense
+     * @param expenseId      the ID of the expense
      * @param authentication the authentication token containing user details
      * @return a ResponseEntity with the expense if found and authorized, or an error status
      */
@@ -73,21 +73,21 @@ public class ExpenseController {
         if (authorizedJourney.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Optional<Expense> expenseServiceOpt = expenseService.getExpenseById(expenseId);
-        if (expenseServiceOpt.isPresent() && expenseServiceOpt.get().getJourney().getJourneyId().equals(journeyId)) {
-            return ResponseEntity.ok(expenseServiceOpt.get());
+        Optional<Expense> expenseOpt = expenseService.getExpenseById(expenseId);
+        if (expenseOpt.isPresent() && expenseOpt.get().getJourney().getJourneyId().equals(journeyId)) {
+            return ResponseEntity.ok(expenseOpt.get());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     /**
-     * Creates a new expenseService for a given journey.
+     * Creates a new expense for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expense    the expenseService data to create
+     * @param expense        the expense data to create
      * @param authentication the authentication token containing user details
-     * @return a ResponseEntity with the created expenseService if successful, or an error status
+     * @return a ResponseEntity with the created expense if successful, or an error status
      */
     @PostMapping("/journey/{journeyId}/expense")
     public ResponseEntity<Expense> createExpense(@PathVariable Long journeyId,
@@ -102,13 +102,13 @@ public class ExpenseController {
     }
 
     /**
-     * Updates an existing expenseService for a given journey.
+     * Updates an existing expense for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expenseId  the ID of the expenseService to update
-     * @param expense    the updated expenseService data
+     * @param expenseId      the ID of the expense to update
+     * @param expense        the updated expense data
      * @param authentication the authentication token containing user details
-     * @return a ResponseEntity with the updated expenseService if successful, or an error status
+     * @return a ResponseEntity with the updated expense if successful, or an error status
      */
     @PutMapping("/journey/{journeyId}/expense/{expenseId}")
     public ResponseEntity<Expense> updateExpense(@PathVariable Long journeyId,
@@ -129,10 +129,10 @@ public class ExpenseController {
     }
 
     /**
-     * Deletes an expenseService for a given journey.
+     * Deletes an expense for a given journey.
      *
      * @param journeyId      the ID of the journey
-     * @param expenseId  the ID of the expenseService to delete
+     * @param expenseId      the ID of the expense to delete
      * @param authentication the authentication token containing user details
      * @return a ResponseEntity with no content if deletion is successful, or an error status
      */
@@ -144,8 +144,8 @@ public class ExpenseController {
         if (authorizedJourney.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Optional<Expense> expenseServiceOpt = expenseService.getExpenseById(expenseId);
-        if (expenseServiceOpt.isPresent() && expenseServiceOpt.get().getJourney().getJourneyId().equals(journeyId)) {
+        Optional<Expense> expenseOpt = expenseService.getExpenseById(expenseId);
+        if (expenseOpt.isPresent() && expenseOpt.get().getJourney().getJourneyId().equals(journeyId)) {
             boolean deleted = expenseService.deleteExpense(expenseId);
             return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
         } else {

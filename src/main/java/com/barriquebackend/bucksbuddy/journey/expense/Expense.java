@@ -2,6 +2,7 @@ package com.barriquebackend.bucksbuddy.journey.expense;
 
 import com.barriquebackend.bucksbuddy.journey.Journey;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -22,6 +23,7 @@ public class Expense {
     private double amount;
 
     @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
 
     public Long getExpenseId() {
