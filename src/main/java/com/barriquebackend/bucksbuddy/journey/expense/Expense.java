@@ -2,9 +2,9 @@ package com.barriquebackend.bucksbuddy.journey.expense;
 
 import com.barriquebackend.bucksbuddy.journey.Journey;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "expense")
@@ -22,9 +22,7 @@ public class Expense {
     private String name;
     private double amount;
 
-    @Temporal(TemporalType.DATE)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date date;
+    private LocalDate date;
 
     public Long getExpenseId() {
         return expenseId;
@@ -50,11 +48,11 @@ public class Expense {
         this.amount = amount;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

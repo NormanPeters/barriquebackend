@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,7 +27,6 @@ public class JWTService {
      * Constructor for JWTService.
      */
     public JWTService() {
-
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
             SecretKey sk = keyGen.generateKey();
@@ -43,16 +44,19 @@ public class JWTService {
      */
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
+
+        Instant now = Instant.now();
+        Instant expiration = now.plus(24, ChronoUnit.HOURS); // 24 hours
+
         return Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(username)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 24 * 1000)) // 24 hours
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiration))
                 .and()
                 .signWith(getKey())
                 .compact();
-
     }
 
     /**
@@ -134,5 +138,4 @@ public class JWTService {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-
 }
